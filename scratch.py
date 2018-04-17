@@ -1,16 +1,32 @@
 from nltk.corpus import wordnet as wn
 
-wn.synsets('dog')
+word = wn.synsets('run')
+for w in word:
+    print w.hypernyms()
 
 from stanfordcorenlp import StanfordCoreNLP
 
-nlp = StanfordCoreNLP(r'G:\JavaLibraries\stanford-corenlp-full-2017-06-09')
+nlp = StanfordCoreNLP('http://corenlp.run', port=80)
 
-sentence = 'Guangdong University of Foreign Studies is located in Guangzhou.'
-print 'Tokenize:', nlp.word_tokenize(sentence)
-print 'Part of Speech:', nlp.pos_tag(sentence)
-print 'Named Entities:', nlp.ner(sentence)
-print 'Constituency Parsing:', nlp.parse(sentence)
-print 'Dependency Parsing:', nlp.dependency_parse(sentence)
+question = 'Who ran the race?'
+# print 'Tokenize:', nlp.word_tokenize(question)
+# print 'Part of Speech:', nlp.pos_tag(question)
+# print 'Named Entities:', nlp.ner(question)
+print 'Constituency Parsing:', nlp.parse(question)
+# print 'Dependency Parsing:', nlp.dependency_parse(question)
+
+answer = 'Jane raced'
+# print 'Tokenize:', nlp.word_tokenize(answer)
+# print 'Part of Speech:', nlp.pos_tag(answer)
+# print 'Named Entities:', nlp.ner(answer)
+print 'Constituency Parsing:', nlp.parse(answer)
+# print 'Dependency Parsing:', nlp.dependency_parse(answer)
+
+import requests
+
+url = "http://corenlp.run:80/tregex"
+request_params = {"pattern": "(NP[$VP]>S)|(NP[$VP]>S\\n)|(NP\\n[$VP]>S)|(NP\\n[$VP]>S\\n)"}
+r = requests.post(url, data=answer, params=request_params)
+print r.json()
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
