@@ -1,25 +1,6 @@
 from nltk.corpus import wordnet as wn
-
-# word = wn.synsets('run')
-# for w in word:
-#     print w.hypernyms()
-
 from stanfordcorenlp import StanfordCoreNLP
 nlp = StanfordCoreNLP('http://corenlp.run', port=80)
-
-# question = 'Do penguins eat food?'
-# tokenq = nlp.word_tokenize(question)
-# posq =  nlp.pos_tag(question)
-# nameq = nlp.ner(question)
-# treeq = nlp.parse(question)
-# depq = nlp.dependency_parse(question)
-#
-# answer = 'Birds eat food'
-# token = nlp.word_tokenize(answer)
-# pos = nlp.pos_tag(answer)
-# name = nlp.ner(answer)
-# tree =  nlp.parse(answer)
-# dep = nlp.dependency_parse(answer)
 
 def sim_dict (q_synset, a_synset):
     sim = {"hypernym": False,
@@ -58,14 +39,3 @@ def yes_no_answer (q_sent, a_sent):
 yes_no_answer("Do penguins eat food?", "Birds eat food.")
 yes_no_answer("Does the penguin give food?", "Birds provide nutrients.")
 yes_no_answer("Do humans ride vehicles?", "The man drives airplanes.")
-
-
-# STUFF FOR TREGEX
-# import requests
-#
-# url = "http://corenlp.run:80/tregex"
-# request_params = {"pattern": "(NP[$VP]>S)|(NP[$VP]>S\\n)|(NP\\n[$VP]>S)|(NP\\n[$VP]>S\\n)"}
-# r = requests.post(url, data=answer, params=request_params)
-# print r.json()
-#
-# nlp.close() # Do not forget to close! The backend server will consume a lot memery.
