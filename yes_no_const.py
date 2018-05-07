@@ -47,20 +47,20 @@ def sim_dict (q_synset, a_synset):
 
 def create_tree(label, ptree, ptree2):
     if (type(ptree[0]) == str):
-        # print ptree[0], ptree2[0]
+        # print (ptree[0], ptree2[0])
         return POS(label, ptree[0], ptree2[0])
     else:
         obj1 = POS(label, "", "")
         for i in ptree:
             for j in ptree2:
                 if (i.label() == j.label()):
-                    # print i.label(), j.label()
+                    # print (i.label(), j.label())
                     obj1.add_modifier(create_tree(i.label(), i, j))
         return obj1
 
 def print_tree (obj):
     for i in obj.modifiers:
-        print i.label, i.q, i.a, i.similar()
+        print (i.label, i.q, i.a, i.similar())
         print_tree(i)
 
 def compare_sentences(sent1, sent2):
@@ -72,15 +72,33 @@ def compare_sentences(sent1, sent2):
     print_tree(POS_obj)
     return POS_obj.similar()
 
-t = nlp.parse("Blue penguins eat fish.")
+t = nlp.parse("Is it false that blue penguins eat fish.")
 t2 = nlp.parse("Red penguins eat fish.")
 ptree = ParentedTree.fromstring(str(t))
 ptree2 = ParentedTree.fromstring(str(t2))
 test = create_tree('ROOT', ptree, ptree2)
 test.similar()
+print nlp.parse("p
+print(t)
 print_tree(test)
 
 compare_sentences("Blue penguins eat fish in Antartica.", "Red penguins eat fish.")
 compare_sentences("All penguins will run.", "All penguins will move.")
+
+
+import requests
+import json
+
+url = "http://corenlp.run/tregex"
+request_paramsN = {"pattern": "(NP[$VP]>S)|(NP[$VP]>S\\n)|(NP\\n[$VP]>S)|(NP\\n[$VP]>S\\n)|(NP[$VP]>SQ)"}
+request_paramsV = {"pattern": "(VP[$NP]>S)|(VP[$NP]>S\\n)|(VP\\n[$NP]>S)|(VP\\n[$NP]>S\\n)|(VP[$NP]>SQ)"}
+text = "The penguin, that climbs the rock, cries."
+r = requests.post(url, data=text, params=request_paramsN)
+jsonresult = r.json()
+print (jsonresult["sentences"])
+
+
+
+
 
 nlp.close()
