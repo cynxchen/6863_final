@@ -8,6 +8,7 @@ from stanfordcorenlp import StanfordCoreNLP
 nlp = StanfordCoreNLP('http://corenlp.run', port=80)
 # nlp = StanfordCoreNLP(r'/Users/cynthiachen/Documents/2018/MIT_final/stanford-corenlp-full-2018-02-27')
 
+# tests if two words for similar by hypernym hyponym or synset
 def sim_dict (q_synset, a_synset):
     sim = {"hypernym": False,
             "hyponym": False,
@@ -22,6 +23,15 @@ def sim_dict (q_synset, a_synset):
                 sim["synset"]=True
     return sim
 
+def are_antonyms (q_lem, a_lem):
+    # EXAMPLE are_antonyms(wn.lemmas("slowly"), wn.lemmas("quickly"))
+    for q in q_lem:
+        for a in a_lem:
+            if q in a.antonyms():
+                return True
+    return False
+
+# extracts either the NP or the VP of the sentence
 def get_tree_part (sentence, part):
     url = "http://corenlp.run:80/tregex"
     request_paramsN = {"pattern": "(NP[$VP]>S)|(NP[$VP]>S\\n)|(NP\\n[$VP]>S)|(NP\\n[$VP]>S\\n)|(NP[$VP]>SQ)"}
@@ -34,16 +44,20 @@ def get_tree_part (sentence, part):
     tree = ParentedTree.fromstring(string)
     return tree
 
+# given the ParentedTree of a parse, create a flattened VP dictinoary
 def create_tree_dict (tree, top_key):
     tree_dict = defaultdict(list)
     for i in tree:
         tree_dict[i.label()].append(i)
-    if top_key in tree_dict:
-        for j in tree_dict[top_key]:
+    if top_key in tree_dict: # gets rid of nested VP
+        for key in tree_dict.keys():
+            if key in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']: # we don't care about modals
+                tree_dict.pop(key)
+        for j in tree_dict[top_key]: # bring nested VP out
             for k in j:
                 tree_dict[k.label()].append(k)
         tree_dict.pop(top_key)
-    for key in tree_dict.keys():
+    for key in tree_dict.keys(): # rename all verb forms into 'Verb'
         if key in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
             tree_dict['Verb'].extend(tree_dict.pop(key))
     return tree_dict
@@ -74,9 +88,9 @@ def compare_adv(q_adv, a_adv):
     for q in q_adv:
         for a in a_adv:
             print q, a
-            q_syn = wn.synsets(q.leaves()[0]) # extract interested verb
+            q_syn = wn.synsets(q.leaves()[0]) # extract interested adverb
             a_syn = wn.synsets(a.leaves()[0])
-            sim = sim_dict(q_syn, a_syn)
+            sim = sim_dict(q_syn, a_syn) # should adverbs we compared with sim_dict?
             adv_comparison.append(any(v == True for v in sim.values()))
     return (any(v == True for v in adv_comparison))
 
@@ -88,22 +102,28 @@ def compare_pp(q_pp, a_pp):
     for q in q_pp:
         for a in a_pp:
             print q, a
-            if (q[0] == a[0]):
+            if (q[0] == a[0]): # only comparing similar PP
                 print q[0], a[0]
-                # q_syn = wn.synsets(q.leaves()[-1]) # extract interested verb
-                # a_syn = wn.synsets(a.leaves()[-1])
-                # sim = sim_dict(q_syn, a_syn)
-                # print sim
-                pp_comparison.append(noun_check(flatten_noun(q[1]), flatten_noun(a[1])))
+                pp_comparison.append(noun_check(flatten_noun(q[1]), flatten_noun(a[1]))) # call noun_check
             else:
                 pp_comparison.append(False)
     return (any(v == True for v in pp_comparison))
 
+def compare_do(q_do, a_do):
+    print "---DO---", q_do, a_do
+    if (not q_do or not a_do):
+        return True
+    return noun_check(flatten_noun(q_do[0]), flatten_noun(q_do[0])) # call noun_check for direct object
+
+# general check for verb phrases
 def verb_check (qtree, atree):
     dict_q = create_tree_dict(qtree, 'VP')
     dict_a = create_tree_dict(atree, 'VP')
     return ((compare_verbs(dict_q['Verb'], dict_a['Verb']) == compare_neg(dict_q['RB'], dict_a['RB']))
-    and compare_adv(dict_q['ADVP'], dict_a['ADVP']) and compare_pp(dict_q['PP'], dict_a['PP']))
+    and compare_do(dict_q['NP'], dict_a['NP'])
+    and compare_adv(dict_q['ADVP'], dict_a['ADVP'])
+    and compare_pp(dict_q['PP'], dict_a['PP']))
+    and compare_adjp
     # return compareVerbs and compareNeg and compareAdv and compareDO and comparePP and compareSBAR
 
 def flatten_noun (tree):
@@ -188,12 +208,12 @@ def compare_sentences(sent1, sent2):
     print ("NOUN SIMILARITY", noun_sim)
     return verb_sim and noun_sim
 
-print compare_sentences("Do humans ride vehicles?", "The man has ridden cars.")
+print compare_sentences("Have the bears finished the honey?", "The bear did not eat the honey.")
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
 
 # Moving Forward
-# - Cynthia: DO, PP, modals, SBAR, test set - verb
+# - Cynthia: SBAR, test set - verb
 # - Sherry: clean up your shit, SBAR, test set - noun, try catch
 # - Future: antonyms, update, possible amendmends (if then, is it true/false, conjugations)
 
