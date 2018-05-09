@@ -36,6 +36,7 @@ def get_Reg_Tree(sentence, pattern):
 q_sent = "Does some yellow dog climb up?"
 a_sent = "Some red animal climbs."
 
+
 q_N = get_Reg_Tree(q_sent, request_paramsN)
 a_N = get_Reg_Tree(a_sent, request_paramsN)
 
@@ -113,6 +114,7 @@ def noun_check (qdict, adict):
                     print("PP", q_pp[1], a_pp[1])
                     if not ppcheck:
                         return False
+    return True
 
     #compareNouns and compareDT and compareJJ and comparePP and compareSBAR
 
