@@ -123,7 +123,6 @@ def verb_check (qtree, atree):
     and compare_do(dict_q['NP'], dict_a['NP'])
     and compare_adv(dict_q['ADVP'], dict_a['ADVP'])
     and compare_pp(dict_q['PP'], dict_a['PP']))
-    and compare_adjp
     # return compareVerbs and compareNeg and compareAdv and compareDO and comparePP and compareSBAR
 
 def flatten_noun (tree):
@@ -208,7 +207,7 @@ def compare_sentences(sent1, sent2):
     print ("NOUN SIMILARITY", noun_sim)
     return verb_sim and noun_sim
 
-print compare_sentences("Have the bears finished the honey?", "The bear did not eat the honey.")
+print compare_sentences("Do some penguins read books about swimming daily?", "Every animal in the northern hemisphere reads books about exercising daily.")
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
 
