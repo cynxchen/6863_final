@@ -122,10 +122,10 @@ def compare_pp(q_pp, a_pp):
     return (any(v == True for v in pp_comparison))
 
 def compare_do(q_do, a_do):
-    print "---DO---", q_do, a_do
+    print ("---DO---", q_do, a_do)
     if (not q_do or not a_do):
         return True
-    return noun_check(flatten_noun(q_do[0]), flatten_noun(q_do[0])) # call noun_check for direct object
+    return noun_check(q_do[0], q_do[0]) # call noun_check for direct object
 
 # general check for verb phrases
 def verb_check (qtree, atree):
@@ -135,7 +135,7 @@ def verb_check (qtree, atree):
     and compare_do(dict_q['NP'], dict_a['NP'])
     and compare_adv(dict_q['ADVP'], dict_a['ADVP'])
     and compare_pp(dict_q['PP'], dict_a['PP']))
-    and compare_adjp
+    #and compare_adjp
     # return compareVerbs and compareNeg and compareAdv and compareDO and comparePP and compareSBAR
 
 def flatten_noun (tree):
@@ -227,7 +227,7 @@ def compare_sentences(sent1, sent2):
     print ("NOUN SIMILARITY", noun_sim)
     return verb_sim and noun_sim
 
-print (compare_sentences("Does the shiny yellow flute make the music", "The blue flute creates the sound."))
+print (compare_sentences("Does the shiny yellow flute make on the table the music", "The yellow flute creates on the floor the sound."))
 print (compare_sentences("Is it true that he finds penguins", "Penguins find him."))
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
