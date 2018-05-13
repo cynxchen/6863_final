@@ -137,12 +137,11 @@ def compare_adjp(q_adjp, a_adjp):
         for a in a_adjp:
             if (q.label() == a.label()):
                 adjp_comparison.append(compare_adj(q,a))
-            else:
-                adjp_comparison.append(False)
-    return (any(v == True for v in adjp_comparison))
+    print adjp_comparison
+    return (all(v for v in adjp_comparison))
 
-ap1 = (ParentedTree.fromstring(nlp.parse("really cute")))[0]
-ap2 = (ParentedTree.fromstring(nlp.parse("very cute")))[0]
+ap1 = (ParentedTree.fromstring(nlp.parse("really beautiful")))[0]
+ap2 = (ParentedTree.fromstring(nlp.parse("really pretty")))[0]
 
 compare_adjp(ap1, ap2)
 
@@ -255,7 +254,7 @@ print (compare_sentences("Does the shiny yellow flute make on the table the musi
 print (compare_sentences("Is it true that he finds penguins", "Penguins find him."))
 print (compare_sentences("Is it true that humans climb trees?", "Every man has climbed a tree before."))
 print (compare_sentences("Is it true that bears from the forest eat?", "The bears from the forest eat honey."))
-print (compare_sentences("Have the students in third grade finished their homework?", "The students in first grade completed their assignments."))
+print (compare_sentences("Did the third graders finish their homework?", "Only the first graders completed their assignments."))
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
 
