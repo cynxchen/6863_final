@@ -24,12 +24,16 @@ def sim_dict (q_synset, a_synset):
                 sim["synset"]=True
     return sim
 
-def are_antonyms (q_lem, a_lem):
-    # EXAMPLE are_antonyms(wn.lemmas("slowly"), wn.lemmas("quickly"))
-    for q in q_lem:
-        for a in a_lem:
-            if q in a.antonyms():
-                return True
+def are_antonyms (q_syns, a_syns):
+    # EXAMPLE are_antonyms(wn.synsets("slowly"), wn.synsetes("quickly"))
+    for q_syn in q_syns:
+        for a_syn in a_syns:
+            q_lems = q_syn.lemmas()
+            a_lems = a_syn.lemmas()
+            for q in q_lems:
+                for a in a_lems:
+                    if q in a.antonyms():
+                        return True
     return False
 
 # extracts either the NP or the VP of the sentence
@@ -100,11 +104,15 @@ def compare_adv(q_adv, a_adv):
     for q in q_adv:
         for a in a_adv:
             print (q, a)
-            q_syn = wn.synsets(q.leaves()[0]) # extract interested verb
-            a_syn = wn.synsets(a.leaves()[0])
-            sim = sim_dict(q_syn, a_syn) # should adverbs we compared with sim_dict?
-            adv_comparison.append(any(v == True for v in sim.values()))
-    return (any(v == True for v in adv_comparison))
+            q_syns = wn.synsets(q.leaves()[0]) # extract interested verb
+            a_syns = wn.synsets(a.leaves()[0])
+            #sim = sim_dict(q_syn, a_syn) # should adverbs we compared with sim_dict?
+            if (are_antonyms(q_syns, a_syns)):
+                return False
+
+            #adv_comparison.append(any(v == True for v in sim.values()))
+    #return (any(v == False for v in adv_comparison))
+    return True
 
 def compare_pp(q_pp, a_pp):
     print ("---PP---", q_pp, a_pp)
@@ -128,6 +136,20 @@ def compare_do(q_do, a_do):
         return True
     return noun_check(q_do[0], a_do[0]) # call noun_check for direct object
 
+def compare_adj(q_adjs, a_adjs):
+    print ("---ADJ---", q_adjs, a_adjs)
+    if q_adjs and a_adjs:
+        for q_jj in q_adjs:
+            for a_jj in a_adjs:
+                #jj_sims = sim_dict(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))
+                if (are_antonyms(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))):
+                    return False
+                #if (any(v for v in jj_sims.values())):
+                #    return True
+        #return False
+    #else:
+    return True
+
 def compare_adjp(q_adjp, a_adjp):
     print ("---ADJP---", q_adjp, a_adjp)
     if ((not q_adjp) or (not a_adjp)): # checks to see if we have any adverbs to compare
@@ -137,14 +159,17 @@ def compare_adjp(q_adjp, a_adjp):
         for a in a_adjp:
             if (q.label() == a.label()):
                 adjp_comparison.append(compare_adj(q,a))
-            else:
-                adjp_comparison.append(False)
-    return (any(v == True for v in adjp_comparison))
+                print(compare_adj(q, a))
+            #else:
+            #    adjp_comparison.append(False)
+    return ((all(v == False for v in adjp_comparison)) or (all(v == True for v in adjp_comparison)))
 
-ap1 = (ParentedTree.fromstring(nlp.parse("really cute")))[0]
-ap2 = (ParentedTree.fromstring(nlp.parse("very cute")))[0]
+ap1 = (ParentedTree.fromstring(nlp.parse("really fast")))[0]
+ap2 = (ParentedTree.fromstring(nlp.parse("really slow")))[0]
 
+are_antonyms(wn.synsets("very"), wn.synsets("not"))
 compare_adjp(ap1, ap2)
+
 
 # general check for verb phrases
 def verb_check (qtree, atree):
@@ -208,18 +233,6 @@ def compare_dt(q_dts, a_dts):
             return False
     return True
 
-def compare_adj(q_adjs, a_adjs):
-    print ("---ADJ---", q_adjs, a_adjs)
-    if q_adjs and a_adjs:
-        for q_jj in q_adjs:
-            for a_jj in a_adjs:
-                jj_sims = sim_dict(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))
-                if (any(v for v in jj_sims.values())):
-                    return True
-        return False
-    else:
-        return True
-
 def noun_check (qtree, atree):
     #compareNouns
     dict_q = flatten_noun(qtree)
@@ -249,11 +262,13 @@ def compare_sentences(sent1, sent2):
     print ("NOUN SIMILARITY", noun_sim)
     return verb_sim and noun_sim
 
+#answer needs to be same structure. (subj subj, verb, verb)
+print (compare_sentences("Is it true that the not cute penguin runs fast", "The cute penguin runs fast"))
 print (compare_sentences("Is it true that the really young penguins are cute?", "All really little birds are cute"))
 print (compare_sentences("Do some penguins read books about sports daily?", "Every animal in the northern hemisphere reads books about sports daily."))
-print (compare_sentences("Does the shiny yellow flute make on the table the music", "The yellow flute creates on the floor the sound."))
+print (compare_sentences("Does the yellow flute make on the table the music", "The blue flute creates on the table the sound."))
 print (compare_sentences("Is it true that he finds penguins", "Penguins find him."))
-print (compare_sentences("Is it true that humans climb trees?", "Every man has climbed a tree before."))
+print (compare_sentences("Is it true that humans climb trees?", "Every man has climbed a tree before.")) # dictionary size error ?
 print (compare_sentences("Is it true that bears from the forest eat?", "The bears from the forest eat honey."))
 print (compare_sentences("Have the students in third grade finished their homework?", "The students in first grade completed their assignments."))
 
