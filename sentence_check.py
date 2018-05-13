@@ -108,7 +108,7 @@ def compare_adv(q_adv, a_adv):
 
 def compare_pp(q_pp, a_pp):
     print ("---PP---", q_pp, a_pp)
-    if (not q_pp or not a_pp): # checks to see if we have any adverbs to compare
+    if ((not q_pp) or (not a_pp)): # checks to see if we have any adverbs to compare
         return True
     pp_comparison = []
     for q in q_pp:
@@ -116,6 +116,7 @@ def compare_pp(q_pp, a_pp):
             print (q, a)
             if (q[0] == a[0]):
                 print (q[0], a[0])
+                print ("--noun-check-in-pp--", q[1], a[1])
                 pp_comparison.append(noun_check(q[1], a[1]))
             else:
                 pp_comparison.append(False)
@@ -125,7 +126,25 @@ def compare_do(q_do, a_do):
     print ("---DO---", q_do, a_do)
     if (not q_do or not a_do):
         return True
-    return noun_check(q_do[0], q_do[0]) # call noun_check for direct object
+    return noun_check(q_do[0], a_do[0]) # call noun_check for direct object
+
+def compare_adjp(q_adjp, a_adjp):
+    print ("---ADJP---", q_adjp, a_adjp)
+    if ((not q_adjp) or (not a_adjp)): # checks to see if we have any adverbs to compare
+        return True
+    adjp_comparison = []
+    for q in q_adjp:
+        for a in a_adjp:
+            if (q.label() == a.label()):
+                adjp_comparison.append(compare_adj(q,a))
+            else:
+                adjp_comparison.append(False)
+    return (any(v == True for v in adjp_comparison))
+
+ap1 = (ParentedTree.fromstring(nlp.parse("really cute")))[0]
+ap2 = (ParentedTree.fromstring(nlp.parse("very cute")))[0]
+
+compare_adjp(ap1, ap2)
 
 # general check for verb phrases
 def verb_check (qtree, atree):
@@ -134,8 +153,8 @@ def verb_check (qtree, atree):
     return ((compare_verbs(dict_q['Verb'], dict_a['Verb']) == compare_neg(dict_q['RB'], dict_a['RB']))
     and compare_do(dict_q['NP'], dict_a['NP'])
     and compare_adv(dict_q['ADVP'], dict_a['ADVP'])
-    and compare_pp(dict_q['PP'], dict_a['PP']))
-    #and compare_adjp
+    and compare_pp(dict_q['PP'], dict_a['PP'])
+    and compare_adjp(dict_q['ADJP'], dict_a['ADJP']))
     # return compareVerbs and compareNeg and compareAdv and compareDO and comparePP and compareSBAR
 
 def flatten_noun (tree):
@@ -144,7 +163,7 @@ def flatten_noun (tree):
         flat[i.label()].append(i)
     def flatten_n_rec(tree):
         if any(sub.label() == 'NP' for sub in tree):
-            for subpart in tree:
+            for subpart in tree[:1]:
                 if subpart.label() == 'NP':
                     flatten_n_rec(subpart)
                 elif subpart.label() in flat:
@@ -205,8 +224,11 @@ def noun_check (qtree, atree):
     #compareNouns
     dict_q = flatten_noun(qtree)
     dict_a = flatten_noun(atree)
-    return (compare_nouns(dict_q['Noun'], dict_a['Noun']) and compare_dt(dict_q['DT'], dict_a['DT'])
-    and compare_adv(dict_q['JJ'], dict_a['JJ']) and compare_pp(dict_q['PP'], dict_a['PP']))
+    return (compare_nouns(dict_q['Noun'], dict_a['Noun'])
+    and compare_dt(dict_q['DT'], dict_a['DT'])
+    and compare_adj(dict_q['JJ'], dict_a['JJ'])
+    and compare_pp(dict_q['PP'], dict_a['PP'])
+    and compare_adjp(dict_q['ADJP'], dict_a['ADJP']))
 
 
 def compare_sentences(sent1, sent2):
@@ -227,11 +249,23 @@ def compare_sentences(sent1, sent2):
     print ("NOUN SIMILARITY", noun_sim)
     return verb_sim and noun_sim
 
-print compare_sentences("Do some penguins read books about swimming daily?", "Every animal in the northern hemisphere reads books about exercising daily.")
+print (compare_sentences("Is it true that the really young penguins are cute?", "All really little birds are cute"))
+print (compare_sentences("Do some penguins read books about sports daily?", "Every animal in the northern hemisphere reads books about sports daily."))
 print (compare_sentences("Does the shiny yellow flute make on the table the music", "The yellow flute creates on the floor the sound."))
 print (compare_sentences("Is it true that he finds penguins", "Penguins find him."))
+print (compare_sentences("Is it true that humans climb trees?", "Every man has climbed a tree before."))
+print (compare_sentences("Is it true that bears from the forest eat?", "The bears from the forest eat honey."))
+print (compare_sentences("Have the students in third grade finished their homework?", "The students in first grade completed their assignments."))
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
+
+# what can we do and why?
+# hypotheses, conclusions
+# what type of indirect questions?
+# discuss specific next steps, 3-4 types of questions
+# more analysis
+# talk to sagar to point to proper machine
+# see if we can bypass parse speech tags
 
 # Moving Forward
 # - Cynthia: SBAR, test set - verb
