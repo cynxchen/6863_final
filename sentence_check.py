@@ -93,8 +93,10 @@ def compare_neg (q_rb, a_rb):
         return False
     elif (((q_rb[0][0] in ['not', "n't"]) and (a_rb[0][0] in ['not', "n't"]))): # both negated
         return True
-    else: # other weird cases
+    elif (((q_rb[0][0] in ['not', "n't"]) or (a_rb[0][0] in ['not', "n't"]))):
         return False
+    else: # other weird cases
+        return True
 
 def compare_adv(q_adv, a_adv):
     print ("---ADV---", q_adv, a_adv)
@@ -142,6 +144,7 @@ def compare_adj(q_adjs, a_adjs):
         for q_jj in q_adjs:
             for a_jj in a_adjs:
                 #jj_sims = sim_dict(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))
+                print(q_jj[0],a_jj[0])
                 if (are_antonyms(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))):
                     return False
                 #if (any(v for v in jj_sims.values())):
@@ -150,33 +153,51 @@ def compare_adj(q_adjs, a_adjs):
     #else:
     return True
 
-def compare_adjp(q_adjp, a_adjp):
+def compare_adjp(q_adjp, a_adjp, q_adj, a_adj):
     print ("---ADJP---", q_adjp, a_adjp)
-    if ((not q_adjp) or (not a_adjp)): # checks to see if we have any adverbs to compare
+    if ((not q_adjp and not q_adj) or (not a_adjp and not a_adj)): # checks to see if we have any adverbs to compare
         return True
-    adjp_comparison = []
-    for q in q_adjp:
-        for a in a_adjp:
-            if (q.label() == a.label()):
-                adjp_comparison.append(compare_adj(q,a))
-<<<<<<< HEAD
-    print adjp_comparison
-    return (all(v for v in adjp_comparison))
+    comparison = {}
+    if (q_adj and a_adj) or (q_adjp and a_adjp):
+        for q in (q_adj or q_adjp[0]):
+            for a in (a_adj or a_adjp[0]):
+                print (q,a)
+                if (q.label() == a.label() == "JJ"):
+                    comparison['JJ'] = compare_adj([q],[a])
+                    print("JJ", compare_adj([q], [a]))
+                elif (q.label() == a.label() == "RB"):
+                    if (not compare_neg([q],[a])):
+                        comparison['RB'] = False
+                        print("NEG", False)
+                    else:
+                        comparison['RB'] = compare_adj([q],[a])
+                        print("RB", compare_adj([q], [a]))
+    else:
+        for q in (q_adj or q_adjp[0]):
+            for a in (a_adj or a_adjp[0]):
+                print (q,a)
+                if (q.label() == a.label() == "JJ"):
+                    comparison['JJ'] = compare_adj([q],[a])
+                    print("JJ", compare_adj([q], [a]))
+                elif (q.label() == "RB" or a.label() == "RB"):
+                    if (not compare_neg([q],[a])):
+                        comparison['RB'] = False
+                        print("NEG", False)
+                    else:
+                        comparison['RB'] = compare_adj([q],[a])
+                        print("RB", compare_adj([q], [a]))
+    print comparison.values()
+    return all(v for v in comparison.values())
 
-ap1 = (ParentedTree.fromstring(nlp.parse("really beautiful")))[0]
-ap2 = (ParentedTree.fromstring(nlp.parse("really pretty")))[0]
-=======
-                print(compare_adj(q, a))
-            #else:
-            #    adjp_comparison.append(False)
-    return ((all(v == False for v in adjp_comparison)) or (all(v == True for v in adjp_comparison)))
-
-ap1 = (ParentedTree.fromstring(nlp.parse("really fast")))[0]
-ap2 = (ParentedTree.fromstring(nlp.parse("really slow")))[0]
->>>>>>> 42963568a039ed30a4fa0b2c53378bc66806f196
-
-are_antonyms(wn.synsets("very"), wn.synsets("not"))
-compare_adjp(ap1, ap2)
+#
+# ap1 = (ParentedTree.fromstring(nlp.parse("very quick")))[0]
+# ap2 = (ParentedTree.fromstring(nlp.parse("very slow")))[0]
+#
+# print ap1
+# print ap2
+# are_antonyms(wn.synsets("not"), wn.synsets("never"))
+# simdict()
+# compare_adjp(ap1, ap2)
 
 
 # general check for verb phrases
@@ -187,16 +208,16 @@ def verb_check (qtree, atree):
     and compare_do(dict_q['NP'], dict_a['NP'])
     and compare_adv(dict_q['ADVP'], dict_a['ADVP'])
     and compare_pp(dict_q['PP'], dict_a['PP'])
-    and compare_adjp(dict_q['ADJP'], dict_a['ADJP']))
+    and compare_adjp(dict_q['ADJP'], dict_a['ADJP'], dict_q['JJ'], dict_a['JJ']))
     # return compareVerbs and compareNeg and compareAdv and compareDO and comparePP and compareSBAR
 
 def flatten_noun (tree):
     flat = defaultdict(list)
-    for i in tree:
-        flat[i.label()].append(i)
+    #for i in tree:
+    #    flat[i.label()].append(i)
     def flatten_n_rec(tree):
         if any(sub.label() == 'NP' for sub in tree):
-            for subpart in tree[:1]:
+            for subpart in tree:
                 if subpart.label() == 'NP':
                     flatten_n_rec(subpart)
                 elif subpart.label() in flat:
@@ -247,9 +268,9 @@ def noun_check (qtree, atree):
     dict_a = flatten_noun(atree)
     return (compare_nouns(dict_q['Noun'], dict_a['Noun'])
     and compare_dt(dict_q['DT'], dict_a['DT'])
-    and compare_adj(dict_q['JJ'], dict_a['JJ'])
+    # and compare_adj(dict_q['JJ'], dict_a['JJ'])
     and compare_pp(dict_q['PP'], dict_a['PP'])
-    and compare_adjp(dict_q['ADJP'], dict_a['ADJP']))
+    and compare_adjp(dict_q['ADJP'], dict_a['ADJP'], dict_q['JJ'], dict_a['JJ']))
 
 
 def compare_sentences(sent1, sent2):
@@ -271,14 +292,16 @@ def compare_sentences(sent1, sent2):
     return verb_sim and noun_sim
 
 #answer needs to be same structure. (subj subj, verb, verb)
+print (compare_sentences("Did the not green penguin eat", "The really green penguin ate."))
 print (compare_sentences("Is it true that the not cute penguin runs fast", "The cute penguin runs fast"))
-print (compare_sentences("Is it true that the really young penguins are cute?", "All really little birds are cute"))
+print (compare_sentences("Is it true that the young penguins are really cute?", "All little birds are really cute"))
 print (compare_sentences("Do some penguins read books about sports daily?", "Every animal in the northern hemisphere reads books about sports daily."))
 print (compare_sentences("Does the yellow flute make on the table the music", "The blue flute creates on the table the sound."))
 print (compare_sentences("Is it true that he finds penguins", "Penguins find him."))
 print (compare_sentences("Is it true that humans climb trees?", "Every man has climbed a tree before.")) # dictionary size error ?
 print (compare_sentences("Is it true that bears from the forest eat?", "The bears from the forest eat honey."))
-print (compare_sentences("Did the third graders finish their homework?", "Only the first graders completed their assignments."))
+print (compare_sentences("Did the primary students finish their homework?", "Only the secondary students completed their assignments."))
+print (compare_sentences("Is it true that the hare always runs quick?", "The hare never runs slow."))
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
 
