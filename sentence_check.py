@@ -61,7 +61,7 @@ def get_tree_part (sentence, part):
         return
 
 # given the ParentedTree of a parse, create a flattened VP dictinoary
-def create_tree_dict (tree, top_key):
+def flatten_verb (tree, top_key):
     tree_dict = defaultdict(list)
     for i in tree:
         tree_dict[i.label()].append(i)
@@ -73,7 +73,7 @@ def create_tree_dict (tree, top_key):
             for k in j:
                 tree_dict[k.label()].append(k)
         tree_dict.pop(top_key)
-    for key in tree_dict.keys(): # rename all verb forms into 'Verb'
+    for key in list(tree_dict): # rename all verb forms into 'Verb'
         if key in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
             tree_dict['Verb'].extend(tree_dict.pop(key))
     return tree_dict
@@ -202,8 +202,8 @@ def compare_adjp(q_adjp, a_adjp, q_adj, a_adj):
 
 # general check for verb phrases
 def verb_check (qtree, atree):
-    dict_q = create_tree_dict(qtree, 'VP')
-    dict_a = create_tree_dict(atree, 'VP')
+    dict_q = flatten_verb(qtree, 'VP')
+    dict_a = flatten_verb(atree, 'VP')
     return ((compare_verbs(dict_q['Verb'], dict_a['Verb']) == compare_neg(dict_q['RB'], dict_a['RB']))
     and compare_do(dict_q['NP'], dict_a['NP'])
     and compare_adv(dict_q['ADVP'], dict_a['ADVP'])
