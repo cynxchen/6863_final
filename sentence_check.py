@@ -7,7 +7,12 @@ from collections import defaultdict
 
 from stanfordcorenlp import StanfordCoreNLP
 nlp = StanfordCoreNLP('http://corenlp.run', port=80)
+print_switch = False
 # nlp = StanfordCoreNLP(r'/Users/cynthiachen/Documents/2018/MIT_final/stanford-corenlp-full-2018-02-27')
+
+def change_print (print_arg):
+    global print_switch
+    print_switch = bool(print_arg)
 
 # tests if two words for similar by hypernym hyponym or synset
 def sim_dict (q_synset, a_synset):
@@ -45,7 +50,7 @@ def get_tree_part (sentence, part):
     try:
         request = requests.post(url, data=sentence, params=select)
         json = request.json()
-        print (json)
+        if print_switch: print (json)
     except:
         print("Cannot connect to coreNLP server")
         raise ConnectionError
@@ -79,14 +84,14 @@ def flatten_verb (tree, top_key):
     return tree_dict
 
 def compare_verbs (q_verb, a_verb):
-    print ("---VERBS---", q_verb, a_verb, q_verb[0][0], a_verb[0][0])
+    if print_switch: print ("---VERBS---", q_verb, a_verb, q_verb[0][0], a_verb[0][0])
     q_syn = wn.synsets(q_verb[0][0]) # extract interested verb
     a_syn = wn.synsets(a_verb[0][0])
     sim = sim_dict(q_syn, a_syn)
     return any(v == True for v in sim.values())
 
 def compare_neg (q_rb, a_rb):
-    print ("---NEG---", q_rb, a_rb)
+    if print_switch: print ("---NEG---", q_rb, a_rb)
     if (not q_rb and not a_rb): # neither negated
         return True
     elif (not q_rb or not a_rb): # one of them negated
@@ -99,106 +104,84 @@ def compare_neg (q_rb, a_rb):
         return True
 
 def compare_adv(q_adv, a_adv):
-    print ("---ADV---", q_adv, a_adv)
+    if print_switch: print ("---ADV---", q_adv, a_adv)
     if (not q_adv or not a_adv): # checks to see if we have any adverbs to compare
         return True
     adv_comparison = []
     for q in q_adv:
         for a in a_adv:
-            print (q, a)
+            # if print_switch: print (q, a)
             q_syns = wn.synsets(q.leaves()[0]) # extract interested verb
             a_syns = wn.synsets(a.leaves()[0])
-            #sim = sim_dict(q_syn, a_syn) # should adverbs we compared with sim_dict?
             if (are_antonyms(q_syns, a_syns)):
                 return False
-
-            #adv_comparison.append(any(v == True for v in sim.values()))
-    #return (any(v == False for v in adv_comparison))
     return True
 
 def compare_pp(q_pp, a_pp):
-    print ("---PP---", q_pp, a_pp)
+    if print_switch: print ("---PP---", q_pp, a_pp)
     if ((not q_pp) or (not a_pp)): # checks to see if we have any adverbs to compare
         return True
     pp_comparison = []
     for q in q_pp:
         for a in a_pp:
-            print (q, a)
+            # if print_switch: print (q, a)
             if (q[0] == a[0]):
-                print (q[0], a[0])
-                print ("--noun-check-in-pp--", q[1], a[1])
+                # if print_switch: print (q[0], a[0])
+                # if print_switch: print ("--noun-check-in-pp--", q[1], a[1])
                 pp_comparison.append(noun_check(q[1], a[1]))
             else:
                 pp_comparison.append(False)
     return (any(v == True for v in pp_comparison))
 
 def compare_do(q_do, a_do):
-    print ("---DO---", q_do, a_do)
+    if print_switch: print ("---DO---", q_do, a_do)
     if (not q_do or not a_do):
         return True
     return noun_check(q_do[0], a_do[0]) # call noun_check for direct object
 
 def compare_adj(q_adjs, a_adjs):
-    print ("---ADJ---", q_adjs, a_adjs)
+    if print_switch: print ("---ADJ---", q_adjs, a_adjs)
     if q_adjs and a_adjs:
         for q_jj in q_adjs:
             for a_jj in a_adjs:
-                #jj_sims = sim_dict(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))
-                print(q_jj[0],a_jj[0])
+                # if print_switch: print(q_jj[0],a_jj[0])
                 if (are_antonyms(wn.synsets(q_jj[0]), wn.synsets(a_jj[0]))):
                     return False
-                #if (any(v for v in jj_sims.values())):
-                #    return True
-        #return False
-    #else:
     return True
 
 def compare_adjp(q_adjp, a_adjp, q_adj, a_adj):
-    print ("---ADJP---", q_adjp, a_adjp)
+    if print_switch: print ("---ADJP---", q_adjp, a_adjp)
     if ((not q_adjp and not q_adj) or (not a_adjp and not a_adj)): # checks to see if we have any adverbs to compare
         return True
     comparison = {}
     if (q_adj and a_adj) or (q_adjp and a_adjp):
         for q in (q_adj or q_adjp[0]):
             for a in (a_adj or a_adjp[0]):
-                print (q,a)
                 if (q.label() == a.label() == "JJ"):
                     comparison['JJ'] = compare_adj([q],[a])
-                    print("JJ", compare_adj([q], [a]))
+                    # if print_switch: print("JJ", compare_adj([q], [a]))
                 elif (q.label() == a.label() == "RB"):
                     if (not compare_neg([q],[a])):
                         comparison['RB'] = False
-                        print("NEG", False)
+                        # if print_switch: print("NEG", False)
                     else:
                         comparison['RB'] = compare_adj([q],[a])
-                        print("RB", compare_adj([q], [a]))
+                        # if print_switch: print("RB", compare_adj([q], [a]))
     else:
         for q in (q_adj or q_adjp[0]):
             for a in (a_adj or a_adjp[0]):
-                print (q,a)
                 if (q.label() == a.label() == "JJ"):
                     comparison['JJ'] = compare_adj([q],[a])
-                    print("JJ", compare_adj([q], [a]))
+                    # if print_switch: print("JJ", compare_adj([q], [a]))
                 elif (q.label() == "RB" or a.label() == "RB"):
                     if (not compare_neg([q],[a])):
                         comparison['RB'] = False
-                        print("NEG", False)
+                        # if print_switch: print("NEG", False)
                     else:
                         comparison['RB'] = compare_adj([q],[a])
-                        print("RB", compare_adj([q], [a]))
-    print comparison.values()
+                        # if print_switch: print("RB", compare_adj([q], [a]))
+    # if print_switch: print (comparison.values())
     return all(v for v in comparison.values())
-
-#
-# ap1 = (ParentedTree.fromstring(nlp.parse("very quick")))[0]
-# ap2 = (ParentedTree.fromstring(nlp.parse("very slow")))[0]
-#
-# print ap1
-# print ap2
-# are_antonyms(wn.synsets("not"), wn.synsets("never"))
-# simdict()
-# compare_adjp(ap1, ap2)
-
 
 # general check for verb phrases
 def verb_check (qtree, atree):
@@ -213,8 +196,6 @@ def verb_check (qtree, atree):
 
 def flatten_noun (tree):
     flat = defaultdict(list)
-    #for i in tree:
-    #    flat[i.label()].append(i)
     def flatten_n_rec(tree):
         if any(sub.label() == 'NP' for sub in tree):
             for subpart in tree:
@@ -236,15 +217,14 @@ def flatten_noun (tree):
     return flat
 
 def compare_nouns(q_noun, a_noun):
-    print ("---NOUN---", q_noun, a_noun)
+    if print_switch: print ("---NOUN---", q_noun, a_noun)
     if q_noun and a_noun:
          nn_sims = sim_dict(wn.synsets(q_noun[0][0]), wn.synsets(a_noun[0][0]))
-        # print("Noun", any(v for v in nn_sims.values()))
          return (any(v for v in nn_sims.values()))
     print("Sentence may not have a subject")
 
 def compare_dt(q_dts, a_dts):
-    print ("---DET---", q_dts, a_dts)
+    if print_switch: print ("---DET---", q_dts, a_dts)
     #every some no
     if q_dts and a_dts:
         q_dt = q_dts[0][0].lower()
@@ -268,12 +248,12 @@ def noun_check (qtree, atree):
     dict_a = flatten_noun(atree)
     return (compare_nouns(dict_q['Noun'], dict_a['Noun'])
     and compare_dt(dict_q['DT'], dict_a['DT'])
-    # and compare_adj(dict_q['JJ'], dict_a['JJ'])
     and compare_pp(dict_q['PP'], dict_a['PP'])
     and compare_adjp(dict_q['ADJP'], dict_a['ADJP'], dict_q['JJ'], dict_a['JJ']))
 
 
-def compare_sentences(sent1, sent2):
+def compare_sentences(sent1, sent2, print_arg=False):
+    change_print(print_arg)
     try:
         n1 = get_tree_part(sent1, 'NP')
         v1 = get_tree_part(sent1, 'VP')
@@ -285,42 +265,10 @@ def compare_sentences(sent1, sent2):
         return
 
     verb_sim = verb_check(v1, v2)
-    print ("VERB SIMILARITY", verb_sim)
+    if print_switch: print ("VERB SIMILARITY", verb_sim)
 
     noun_sim = noun_check(n1, n2)
-    print ("NOUN SIMILARITY", noun_sim)
-    return verb_sim and noun_sim
-
-#answer needs to be same structure. (subj subj, verb, verb)
-print (compare_sentences("Did the not green penguin eat", "The really green penguin ate."))
-print (compare_sentences("Is it true that the not cute penguin runs fast", "The cute penguin runs fast"))
-print (compare_sentences("Is it true that the young penguins are really cute?", "All little birds are really cute"))
-print (compare_sentences("Do some penguins read books about sports daily?", "Every animal in the northern hemisphere reads books about sports daily."))
-print (compare_sentences("Does the yellow flute make on the table the music", "The blue flute creates on the table the sound."))
-print (compare_sentences("Is it true that he finds penguins", "Penguins find him."))
-print (compare_sentences("Is it true that humans climb trees?", "Every man has climbed a tree before.")) # dictionary size error ?
-print (compare_sentences("Is it true that bears from the forest eat?", "The bears from the forest eat honey."))
-print (compare_sentences("Did the primary students finish their homework?", "Only the secondary students completed their assignments."))
-print (compare_sentences("Is it true that the hare always runs quick?", "The hare never runs slow."))
+    if print_switch: print ("NOUN SIMILARITY", noun_sim)
+    return "Yes." if verb_sim and noun_sim else "No."
 
 nlp.close() # Do not forget to close! The backend server will consume a lot memery.
-
-# what can we do and why?
-# hypotheses, conclusions
-# what type of indirect questions?
-# discuss specific next steps, 3-4 types of questions
-# more analysis
-# talk to sagar to point to proper machine
-# see if we can bypass parse speech tags
-
-# Moving Forward
-# - Cynthia: SBAR, test set - verb
-# - Sherry:  SBAR, test set - noun
-# - Future: antonyms, update, possible amendmends (if then, is it true/false, conjugations)
-
-# Examples to fix
-# DOUBLE NEGATIVE - > print compare_sentences("Do no penguins run on the ice?", "Every penguin does not run quickly on the ice.")
-
-# Things to ask
-# StanfordCoreNLP (parsing, and the server)
-# scope? double negatives, conjunctions
