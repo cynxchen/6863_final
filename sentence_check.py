@@ -129,9 +129,9 @@ def compare_pp(q_pp, a_pp):
                 # if print_switch: print (q[0], a[0])
                 # if print_switch: print ("--noun-check-in-pp--", q[1], a[1])
                 pp_comparison.append(noun_check(q[1], a[1]))
-            else:
-                pp_comparison.append(False)
-    return (any(v == True for v in pp_comparison))
+            # else:
+            #     pp_comparison.append(False)
+    return (not pp_comparison or any(v == True for v in pp_comparison))
 
 def compare_do(q_do, a_do):
     if print_switch: print ("---DO---", q_do, a_do)
