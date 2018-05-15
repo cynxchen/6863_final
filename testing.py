@@ -12,8 +12,6 @@ print (compare_sentences("Is it true that bears from the forest eat?", "The bear
 print (compare_sentences("Did the primary students finish their homework?", "Only the secondary students completed their assignments."))
 print (compare_sentences("Is it true that the hare always runs quick?", "The hare never runs slow."))
 
-
-
 #TESTING
 
 print (compare_sentences("Is it true that punctuation is used in many essays?", "The asterisk is used a lot in papers."))
@@ -49,3 +47,23 @@ print (compare_sentences("Did the girl defeat the boss to go to the next level?"
 #NO/NO
 print (compare_sentences("Do all elephants run for president?", "Male elephants do not run for president."))
 #NO/NO
+#test sentences
+print (compare_sentences("Did the automobile get stopped by the police today?", "The car with the blinkers got stopped today."))
+print (compare_sentences("Is it true that the girl’s favorite show is on the Discovery channel?", "Her favorite channel is the Disney channel."))
+print (compare_sentences("Is it true that the your favorite type of chocolate is not dark chocolate?", "My favorite type of chocolate is milk chocolate with caramel."))
+print (compare_sentences("Does the alarm never go off?", "The emergency alarm went off this morning."))
+print (compare_sentences("Is it true that the lady’s clothing is very beautiful?", "The girl’s dress is really pretty."))
+print (compare_sentences("Is it true that the warm weather makes her sad?", "She’s very glad the weather is warm."))
+print (compare_sentences("Does the pupil use many hyphenations in her writing?", "The student uses a lot of hyphenation in her essays."))
+print (compare_sentences("Did some people go to the event in the city?", "Everyone went to the mixer in Boston today."))
+print (compare_sentences("Is it true that the winners of the competition did not receive a trophy?", "The prize for the competition was a trophy."))
+print (compare_sentences("Does the boss give promotions to the employees yesterday?", "His boss gave him a promotion today."))
+print (compare_sentences("Is is true that his interests are in sports?", "The hobby of the agent is football."))
+print (compare_sentences("Did the coach tell your grandmother to exercise?", "A coach told my granny to visit the new room."))
+print (compare_sentences("Have his organs been making sounds?", "His intestines make sound when he is hungry."))
+print (compare_sentences("Does the obligation of the student depend on the teacher?", "The obligation of the teacher depends on the student."))
+print (compare_sentences("Do all insecure banks not ask for passwords?", "Every secure bank account asks for a password."))
+print (compare_sentences("Did the wasp sting the boy on the arm?", "Yesterday the wasp stung the boy on the nose."))
+print (compare_sentences("Does every animal roll?", "Some armadillos rolls around on the grass."))
+print (compare_sentences("Does the worker always put tiles together?", "A house builder sometimes lays tiles on the floor."))
+print (compare_sentences("Will the parade leader trip on the wire?", "The leader of the parade tripped on the wire for the microphone."))
