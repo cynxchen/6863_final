@@ -71,7 +71,7 @@ def flatten_verb (tree, top_key):
     for i in tree:
         tree_dict[i.label()].append(i)
     if top_key in tree_dict: # gets rid of nested VP
-        for key in tree_dict.keys():
+        for key in list(tree_dict):
             if key in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']: # we don't care about modals
                 tree_dict.pop(key)
         for j in tree_dict[top_key]: # bring nested VP out
