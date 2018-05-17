@@ -1,6 +1,8 @@
 # Translating Indirect Responses to Direct Answers
 Cynthia Chen (cchen16), Sherry Xu (sherryxu), Adis Ojeda (adiso)
 
+Github repository: https://github.com/cynxchen/6863_final
+
 ### Overview
 Our final project for 6.863J is on researching conversations and understanding how indirect responses to Yes-No questions can be translated into a direct "Yes" or "No" answer.
 
