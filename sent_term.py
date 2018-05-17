@@ -7,5 +7,5 @@ parser.add_argument("-p", action='store_true', help="trees and component compari
 args = parser.parse_args()
 
 print (compare_sentences(args.sentences[0], args.sentences[1], print_arg=args.p))
-
+nlp.close()
 #cmd
