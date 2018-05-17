@@ -30,7 +30,7 @@ def sim_dict (q_synset, a_synset):
     return sim
 
 def are_antonyms (q_syns, a_syns):
-    # EXAMPLE are_antonyms(wn.synsets("slowly"), wn.synsetes("quickly"))
+    # EXAMPLE are_antonyms(wn.synsets("slowly"), wn.synsets("quickly"))
     for q_syn in q_syns:
         for a_syn in a_syns:
             q_lems = q_syn.lemmas()
@@ -52,7 +52,7 @@ def get_tree_part (sentence, part):
         json = request.json()
         if print_switch: print (json)
     except:
-        print("Cannot connect to coreNLP server")
+        print("Cannot connect to coreNLP server. Try again later.")
         raise ConnectionError
         return
     try:
@@ -60,7 +60,7 @@ def get_tree_part (sentence, part):
         tree = ParentedTree.fromstring(string)
         return tree
     except:
-        print("Parsing error in sentence:", sentence)
+        print("Parsing issue in sentence:", sentence)
         print("Recieved parse:", nlp.parse(sentence))
         raise ValueError
         return
@@ -229,8 +229,8 @@ def compare_dt(q_dts, a_dts):
     if q_dts and a_dts:
         q_dt = q_dts[0][0].lower()
         a_dt = a_dts[0][0].lower()
-        if q_dt == "every":
-            if not (a_dt == "every"):
+        if q_dt == "every" or q_dt == "all":
+            if not (a_dt == "every" or a_dt == "all"):
                 return False
         elif q_dt == "some":
             if not (a_dt != "no"):
@@ -260,9 +260,9 @@ def compare_sentences(sent1, sent2, print_arg=False):
         n2 = get_tree_part(sent2, 'NP')
         v2 = get_tree_part(sent2, 'VP')
     except ValueError as e:
-        return
+        return "Error."
     except ConnectionError as e:
-        return
+        return "Error."
 
     verb_sim = verb_check(v1, v2)
     if print_switch: print ("VERB SIMILARITY", verb_sim)
