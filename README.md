@@ -16,6 +16,13 @@ To run our program, you will need to have the python wrapper for StanfordCoreNLP
 pip install stanfordcorenlp
 ```
 Here is the python wrapper we use: https://github.com/Lynten/stanford-corenlp
+
+You will also need to have Python NLTK installed.
+```
+sudo pip install -U nltk
+```
+Here is installation information for NLTK: https://www.nltk.org/install.html 
+
 ### Description of Files
 #### 1. sentence_check.py
 This file contains our system.
