@@ -1,6 +1,7 @@
 from sentence_check import *
 
 #answer needs to be same structure. (subj subj, verb, verb)
+print (compare_sentences("Do some small penguins on the rock eat food?", "Every little bird under the sun consumes food.", True))
 print (compare_sentences("Did the not green penguin eat", "The really green penguin ate."))
 print (compare_sentences("Is it true that the not cute penguin runs fast", "The cute penguin runs fast"))
 print (compare_sentences("Is it true that the young penguins are really cute?", "All little birds are really cute"))
@@ -14,11 +15,11 @@ print (compare_sentences("Is it true that the hare always runs quick?", "The har
 
 #TESTING SET
 print (compare_sentences("Did the automobile get stopped by the police today?", "The car with the blinkers got stopped today."))
-print (compare_sentences("Is it true that the girl’s favorite show is on the Discovery channel?", "Her favorite channel is the Disney channel."))
+print (compare_sentences("Is it true that the girl's favorite show is on the Discovery channel?", "Her favorite channel is the Disney channel."))
 print (compare_sentences("Is it true that your favorite type of chocolate is not dark chocolate?", "My favorite type of chocolate is milk chocolate with caramel."))
 print (compare_sentences("Does the alarm never go off?", "The emergency alarm went off this morning."))
-print (compare_sentences("Is it true that the lady’s clothing is very beautiful?", "The girl’s dress is really pretty."))
-print (compare_sentences("Is it true that the warm weather makes her sad?", "She’s very glad the weather is warm."))
+print (compare_sentences("Is it true that the lady's clothing is very beautiful?", "The girl's dress is really pretty."))
+print (compare_sentences("Is it true that the warm weather makes her sad?", "She's very glad the weather is warm."))
 print (compare_sentences("Does the pupil use many hyphenations in her writing?", "The student uses a lot of hyphenation in her essays."))
 print (compare_sentences("Did some people go to the event in the city?", "Everyone went to the mixer in Boston today."))
 print (compare_sentences("Is it true that the winners of the competition did not receive a trophy?", "The prize for the competition was a trophy."))
