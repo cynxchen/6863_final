@@ -53,7 +53,7 @@ def get_tree_part (sentence, part):
         if print_switch: print (json)
     except:
         print("Cannot connect to coreNLP server. Try again later.")
-        raise ConnectionError
+        raise Exception
         return
     try:
         string = str(dict(json['sentences'][0])['0']['match'])
@@ -62,7 +62,7 @@ def get_tree_part (sentence, part):
     except:
         print("Parsing issue in sentence:", sentence)
         print("Recieved parse:", nlp.parse(sentence))
-        raise ValueError
+        raise Exception
         return
 
 # given the ParentedTree of a parse, create a flattened VP dictinoary
@@ -259,9 +259,7 @@ def compare_sentences(sent1, sent2, print_arg=False):
         v1 = get_tree_part(sent1, 'VP')
         n2 = get_tree_part(sent2, 'NP')
         v2 = get_tree_part(sent2, 'VP')
-    except ValueError as e:
-        return "Error."
-    except ConnectionError as e:
+    except Exception as e:
         return "Error."
 
     verb_sim = verb_check(v1, v2)
@@ -271,4 +269,4 @@ def compare_sentences(sent1, sent2, print_arg=False):
     if print_switch: print ("NOUN SIMILARITY", noun_sim)
     return "Yes." if verb_sim and noun_sim else "No."
 
-nlp.close() # Do not forget to close! The backend server will consume a lot memery.
+# nlp.close() # Do not forget to close! The backend server will consume a lot memery.

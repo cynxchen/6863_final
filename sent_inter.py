@@ -5,15 +5,15 @@ from six.moves import input
 def compare(args):
 
     while (True):
-        print ("Question:")
+        print ("--Question--")
         question = str(input());
         if (question in ['', 'exit', 'quit']): break
 
-        print ("Indirect Answer:")
+        print ("--Indirect Answer--")
         answer = str(input());
         if (answer in ['', 'exit', 'quit']): break
 
-        print("Direct Answer:")
+        print("--Direct Answer--")
         print (compare_sentences(question, answer, print_arg=args.p)+"\n")
 
 if __name__=='__main__':
@@ -23,5 +23,6 @@ if __name__=='__main__':
     args = parser.parse_args()
     print ("Welcome. May take a couple seconds to load. To exit, type exit")
     compare(args)
+    nlp.close()
 
 #cmd

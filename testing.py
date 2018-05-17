@@ -5,9 +5,12 @@ def test_print (q, a, exp):
     print ("Question: ", q)
     print ("Indirect Answer: ", a)
     print ("* Expected: ", exp)
-    result = compare_sentences(q, a)
-    print ("* Actual: ", result)
-    print ("* MATCH?: ", exp == result)
+    try:
+        result = compare_sentences(q, a)
+        print ("* Actual: ", result)
+        print ("* MATCH?: ", exp == result)
+    except:
+        print ("*** An Error Occured ***")
 
 #answer needs to be same structure. (subj subj, verb, verb)
 print ("--- EXAMPLE SENTENCES ---")
@@ -60,3 +63,4 @@ test_print("Did the girl defeat the boss to go to the next level?", "A boy defea
 test_print("Do all elephants run for president?", "Male elephants do not run for president.", "No.")#NO/NO
 test_print("Will the parade leader trip on the wire?", "The leader of the parade tripped on the wire for the microphone.", "Yes.")
 test_print("Does the worker always put tiles together?", "A house builder sometimes lays tiles on the floor.", "No.")
+nlp.close()
